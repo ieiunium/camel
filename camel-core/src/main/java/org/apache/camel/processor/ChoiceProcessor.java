@@ -30,6 +30,7 @@ import org.apache.camel.support.ServiceSupport;
 import org.apache.camel.util.AsyncProcessorConverterHelper;
 import org.apache.camel.util.AsyncProcessorHelper;
 import org.apache.camel.util.ServiceHelper;
+import org.apache.camel.util.TracingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +80,7 @@ public class ChoiceProcessor extends ServiceSupport implements AsyncProcessor, N
         while (processors.hasNext()) {
             // get the next processor
             Processor processor = processors.next();
-
+            TracingUtils.trace(processor, exchange);
             // evaluate the predicate on filter predicate early to be faster
             // and avoid issues when having nested choices
             // as we should only pick one processor

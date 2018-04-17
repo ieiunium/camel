@@ -16,6 +16,9 @@
  */
 package org.apache.camel.model;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -25,6 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.camel.NamedNode;
 import org.apache.camel.spi.NodeIdFactory;
+import org.apache.camel.util.TracingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Allows an element to have an optional ID specified
@@ -35,10 +41,22 @@ import org.apache.camel.spi.NodeIdFactory;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 // must use XmlAccessType.PROPERTY which is required by camel-spring / camel-blueprint for their namespace parsers
 public abstract class OptionalIdentifiedDefinition<T extends OptionalIdentifiedDefinition<T>> implements NamedNode {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OptionalIdentifiedDefinition.class);
+
     private transient String shortName;
     private String id;
     private Boolean customId;
     private DescriptionDefinition description;
+    public final List<StackTraceElement> stackTrace;
+
+    public OptionalIdentifiedDefinition() {
+        List<StackTraceElement> list = TracingUtils.getRouteBuilderStackTraceElements();
+        stackTrace = Collections.unmodifiableList(list);
+        for (final StackTraceElement element : list) {
+            LOG.info("Definition at: " + element);
+        }
+    }
 
     @Override
     public String getId() {

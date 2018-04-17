@@ -369,4 +369,8 @@ public class DefaultChannel extends CamelInternalProcessor implements ModelChann
         return "Channel[" + nextProcessor + "]";
     }
 
+
+    public ProcessorDefinition<?> getChildDefinition() {
+        return childDefinition;
+    }
 }

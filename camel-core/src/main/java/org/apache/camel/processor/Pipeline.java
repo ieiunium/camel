@@ -16,6 +16,8 @@
  */
 package org.apache.camel.processor;
 
+import static org.apache.camel.processor.PipelineHelper.continueProcessing;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -29,16 +31,15 @@ import org.apache.camel.Traceable;
 import org.apache.camel.util.AsyncProcessorConverterHelper;
 import org.apache.camel.util.AsyncProcessorHelper;
 import org.apache.camel.util.ExchangeHelper;
+import org.apache.camel.util.TracingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.camel.processor.PipelineHelper.continueProcessing;
 
 /**
  * Creates a Pipeline pattern where the output of the previous step is sent as
  * input to the next step, reusing the same message exchanges
  *
- * @version 
+ * @version
  */
 public class Pipeline extends MulticastProcessor implements AsyncProcessor, Traceable {
     private static final Logger LOG = LoggerFactory.getLogger(Pipeline.class);
@@ -75,7 +76,7 @@ public class Pipeline extends MulticastProcessor implements AsyncProcessor, Trac
 
             // get the next processor
             Processor processor = processors.next();
-
+            TracingUtils.trace(processor, exchange);
             AsyncProcessor async = AsyncProcessorConverterHelper.convert(processor);
             boolean sync = process(exchange, nextExchange, callback, processors, async);
 

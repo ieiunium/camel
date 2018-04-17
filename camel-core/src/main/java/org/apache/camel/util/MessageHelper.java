@@ -35,6 +35,7 @@ import org.apache.camel.MessageHistory;
 import org.apache.camel.StreamCache;
 import org.apache.camel.StringSource;
 import org.apache.camel.WrappedFile;
+import org.apache.camel.impl.TraceMessageHistory;
 import org.apache.camel.spi.ExchangeFormatter;
 
 /**
@@ -45,7 +46,7 @@ import org.apache.camel.spi.ExchangeFormatter;
 public final class MessageHelper {
 
     private static final String MESSAGE_HISTORY_HEADER = "%-20s %-20s %-80s %-12s";
-    private static final String MESSAGE_HISTORY_OUTPUT = "[%-18.18s] [%-18.18s] [%-78.78s] [%10.10s]";
+    private static final String MESSAGE_HISTORY_OUTPUT = "[%-40.40s] [%-18.18s] [%-150.150s] [%10.10s]";
 
     /**
      * Utility classes should not have a public constructor.
@@ -532,14 +533,26 @@ public final class MessageHelper {
 
         // and then each history
         for (MessageHistory history : list) {
-            routeId = history.getRouteId() != null ? history.getRouteId() : "";
-            id = history.getNode().getId();
-            // we need to avoid leak the sensible information here
-            label =  URISupport.sanitizeUri(history.getNode().getLabel());
-            elapsed = history.getElapsed();
+            if (history instanceof TraceMessageHistory) {
+                TraceMessageHistory traceHistory = TraceMessageHistory.class.cast(history);
+                List<StackTraceElement> trace = traceHistory.getTrace();
+                if (trace != null) {
+                    for (StackTraceElement i : trace) {
+                        sb.append("\t");
+                        sb.append(trace);
+                        sb.append("\n");
+                    }
+                }
+            } else {
+                routeId = history.getRouteId() != null ? history.getRouteId() : "";
+                id = history.getNode().getId();
+                // we need to avoid leak the sensible information here
+                label = URISupport.sanitizeUri(history.getNode().getLabel());
+                elapsed = history.getElapsed();
 
-            sb.append(String.format(MESSAGE_HISTORY_OUTPUT, routeId, id, label, elapsed));
-            sb.append("\n");
+                sb.append(String.format(MESSAGE_HISTORY_OUTPUT, routeId, id, label, elapsed));
+                sb.append("\n");
+            }
         }
 
         if (exchangeFormatter != null) {
