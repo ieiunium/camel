@@ -46,7 +46,7 @@ import org.apache.camel.spi.ExchangeFormatter;
 public final class MessageHelper {
 
     private static final String MESSAGE_HISTORY_HEADER = "%-20s %-20s %-80s %-12s";
-    private static final String MESSAGE_HISTORY_OUTPUT = "[%-40.40s] [%-18.18s] [%-150.150s] [%10.10s]";
+    private static final String MESSAGE_HISTORY_OUTPUT = "[%-18.18s] [%-18.18s] [%-78.78s] [%10.10s]";
 
     /**
      * Utility classes should not have a public constructor.
@@ -552,6 +552,17 @@ public final class MessageHelper {
 
                 sb.append(String.format(MESSAGE_HISTORY_OUTPUT, routeId, id, label, elapsed));
                 sb.append("\n");
+                final int routeIdLen = 18;
+                final int idLen = 18;
+                final int labelLen = 78;
+                final String cuttedRouteId = substring(routeId, routeIdLen);
+                final String cuttedId = substring(id, idLen);
+                final String cuttedLabel = substring(label, labelLen);
+                if(!(cuttedId.isEmpty() && cuttedRouteId.isEmpty() && cuttedLabel.isEmpty())) {
+                    String secondLine = String.format(MESSAGE_HISTORY_OUTPUT, cuttedRouteId, cuttedId, cuttedLabel, "");
+                    sb.append(secondLine);
+                    sb.append("\n");
+                }
             }
         }
 
@@ -569,4 +580,10 @@ public final class MessageHelper {
         return sb.toString();
     }
 
+    public static String substring(String in, int begin){
+        if(in.length() < begin){
+            return "";
+        }
+        return in.substring(begin);
+    }
 }
