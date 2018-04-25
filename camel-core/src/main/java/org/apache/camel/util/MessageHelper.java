@@ -538,7 +538,6 @@ public final class MessageHelper {
                 List<StackTraceElement> trace = traceHistory.getTrace();
                 if (trace != null) {
                     for (StackTraceElement i : trace) {
-                        sb.append("\t");
                         sb.append(trace);
                         sb.append("\n");
                     }
